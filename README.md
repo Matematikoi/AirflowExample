@@ -37,3 +37,10 @@ airflow standalone
 ```
 
 You can check the current DAGs on `http://localhost:8080/`
+
+# FIX LINT
+
+To run the fix linter run 
+```sh
+sh fix_lint
+```
