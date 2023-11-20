@@ -6,6 +6,7 @@ import os
 import tarfile
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
+from smtplib import SMTP
 
 
 def scan_for_log_func():
@@ -42,19 +43,22 @@ def transform_data_func():
                 destination_file.write(f'{counter}. ' + value + '\n')
                 counter = counter + 1
 
+
 def load_data_func():
     file_transform = io.get_absolute_path(io.Filename.transformed_data)
     tar_file = io.get_absolute_path(io.Filename.weblog)
     with tarfile.open(tar_file, 'w') as tar:
         tar.add(file_transform, arcname=os.path.basename(file_transform))
-        
+
+
 def send_message_func():
     # Email configuration
     sender_email = "jclozdibil27@gmail.com"
     receiver_email = "jose.lozano.dibildox@ulb.be"
-    password = "wuyd dfsc ntue tyix" # App password
+    password = "wuyd dfsc ntue tyix"  # App password
 
-    # Message configuration (change content if you think another version is more appropiate)
+    # Message configuration (change content if you think another version is
+    # more appropiate)
     subject = "Workload success"
     body = "The workflow has been executed"
 
@@ -67,11 +71,15 @@ def send_message_func():
     # Attach the body of the email
     message.attach(MIMEText(body, "plain"))
 
-    with smtplib.SMTP("smtp.gmail.com", 587) as server:
+    with SMTP("smtp.gmail.com", 587) as server:
         server.starttls()  # Start TLS for security
         server.login(sender_email, password)  # Log in to the email account
-        server.sendmail(sender_email, receiver_email, message.as_string())  # Send the email
+        server.sendmail(
+            sender_email,
+            receiver_email,
+            message.as_string())  # Send the email
         server.quit()  # Quit the SMTP server
+
 
 with DAG('process_web_log', start_date=datetime(2023, 1, 1),
          description='Workflow to transform a web server log file', tags=['info-h420'],
