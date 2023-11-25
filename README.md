@@ -44,3 +44,7 @@ To run the fix linter run
 ```sh
 sh fix_lint
 ```
+
+# Changing the email receiver.
+
+To change who receive the email modify the `receiver_email` variable inside the `send_message_func` function inside the file `dags/process_web_log.py`.

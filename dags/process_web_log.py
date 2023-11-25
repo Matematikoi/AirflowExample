@@ -4,6 +4,9 @@ from airflow.operators.python import PythonOperator
 import filenames as io
 import os
 import tarfile
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
+from smtplib import SMTP
 
 
 def scan_for_log_func():
@@ -48,6 +51,36 @@ def load_data_func():
         tar.add(file_transform, arcname=os.path.basename(file_transform))
 
 
+def send_message_func():
+    # Email configuration
+    sender_email = "testerlozano@gmail.com"
+    receiver_email = "jose.lozano.dibildox@ulb.be"
+    password = "zsjs fwxs dqdw szqe"  # App password
+
+    # Message configuration (change content if you think another version is
+    # more appropiate)
+    subject = "Workload success"
+    body = "The workflow has been executed"
+
+    # Set up the MIMEText and MIMEMultipart
+    message = MIMEMultipart()
+    message["From"] = sender_email
+    message["To"] = receiver_email
+    message["Subject"] = subject
+
+    # Attach the body of the email
+    message.attach(MIMEText(body, "plain"))
+
+    with SMTP("smtp.gmail.com", 587) as server:
+        server.starttls()  # Start TLS for security
+        server.login(sender_email, password)  # Log in to the email account
+        server.sendmail(
+            sender_email,
+            receiver_email,
+            message.as_string())  # Send the email
+        server.quit()  # Quit the SMTP server
+
+
 with DAG('process_web_log', start_date=datetime(2023, 1, 1),
          description='Workflow to transform a web server log file', tags=['info-h420'],
          schedule='@daily', catchup=False):
@@ -64,5 +97,8 @@ with DAG('process_web_log', start_date=datetime(2023, 1, 1),
     load_data = PythonOperator(
         task_id='load_data',
         python_callable=load_data_func)
+    send_message = PythonOperator(
+        task_id='send_message',
+        python_callable=send_message_func)
 
-    scan_for_log >> extract_data >> transform_data >> load_data
+    scan_for_log >> extract_data >> transform_data >> load_data >> send_message
