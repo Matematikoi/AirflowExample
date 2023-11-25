@@ -53,9 +53,9 @@ def load_data_func():
 
 def send_message_func():
     # Email configuration
-    sender_email = "jclozdibil27@gmail.com"
+    sender_email = "testerlozano@gmail.com"
     receiver_email = "jose.lozano.dibildox@ulb.be"
-    password = "wuyd dfsc ntue tyix"  # App password
+    password = "zsjs fwxs dqdw szqe"  # App password
 
     # Message configuration (change content if you think another version is
     # more appropiate)
